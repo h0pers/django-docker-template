@@ -1,11 +1,24 @@
-FROM python:3.11-alpine as base
+FROM ghcr.io/astral-sh/uv:python3.11-alpine AS base
 
-FROM base as builder
+# uv options
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/opt/venv \
+    VIRTUAL_ENV=/opt/venv \
+    PATH="/opt/venv/bin:$PATH"
 
-RUN apk update && apk --no-cache add python3-dev libpq-dev && mkdir /install
-WORKDIR /install
-COPY requirements.txt ./
-RUN pip install --no-cache-dir --prefix=/install -r ./requirements.txt
+FROM base AS deps
+
+ARG PROJECT_NAME=website
+ARG DJANGO_BASE_DIR=/usr/src/$PROJECT_NAME
+WORKDIR $DJANGO_BASE_DIR
+
+RUN apk --no-cache add python3-dev libpq-dev
+
+COPY pyproject.toml uv.lock ./
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --no-dev
 
 FROM base
 
@@ -27,38 +40,39 @@ ARG DJANGO_SUPERUSER_PASSWORD=admin
 ARG DJANGO_SUPERUSER_EMAIL=admin@example.com
 ARG DJANGO_DEV_SERVER_PORT=8000
 
-
 ENV \
-	USER=$USER \
-	USER_UID=$USER_UID \
-	PROJECT_NAME=$PROJECT_NAME \
-	GUNICORN_PORT=$GUNICORN_PORT \
-	GUNICORN_WORKERS=$GUNICORN_WORKERS \
-	GUNICORN_TIMEOUT=$GUNICORN_TIMEOUT \
-	GUNICORN_LOG_LEVEL=$GUNICORN_LOG_LEVEL \
-	DJANGO_BASE_DIR=$DJANGO_BASE_DIR \
-	DJANGO_STATIC_ROOT=$DJANGO_STATIC_ROOT \
-	DJANGO_MEDIA_ROOT=$DJANGO_MEDIA_ROOT \
-	DJANGO_SQLITE_DIR=$DJANGO_SQLITE_DIR \
-	DJANGO_SUPERUSER_USERNAME=$DJANGO_SUPERUSER_USERNAME \
-	DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD \
-	DJANGO_SUPERUSER_EMAIL=$DJANGO_SUPERUSER_EMAIL \
-	DJANGO_DEV_SERVER_PORT=$DJANGO_DEV_SERVER_PORT
+    USER=$USER \
+    USER_UID=$USER_UID \
+    PROJECT_NAME=$PROJECT_NAME \
+    GUNICORN_PORT=$GUNICORN_PORT \
+    GUNICORN_WORKERS=$GUNICORN_WORKERS \
+    GUNICORN_TIMEOUT=$GUNICORN_TIMEOUT \
+    GUNICORN_LOG_LEVEL=$GUNICORN_LOG_LEVEL \
+    DJANGO_BASE_DIR=$DJANGO_BASE_DIR \
+    DJANGO_STATIC_ROOT=$DJANGO_STATIC_ROOT \
+    DJANGO_MEDIA_ROOT=$DJANGO_MEDIA_ROOT \
+    DJANGO_SQLITE_DIR=$DJANGO_SQLITE_DIR \
+    DJANGO_SUPERUSER_USERNAME=$DJANGO_SUPERUSER_USERNAME \
+    DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD \
+    DJANGO_SUPERUSER_EMAIL=$DJANGO_SUPERUSER_EMAIL \
+    DJANGO_DEV_SERVER_PORT=$DJANGO_DEV_SERVER_PORT
 
+# Runtime deps only + user
+RUN apk add --no-cache su-exec libpq-dev && \
+    adduser -s /bin/sh -D -u $USER_UID $USER
 
-COPY --from=builder /install /usr/local
+COPY --from=deps /opt/venv /opt/venv
+
+WORKDIR $DJANGO_BASE_DIR
+
 COPY docker-entrypoint.sh /
 COPY docker-cmd.sh /
 COPY $PROJECT_NAME $DJANGO_BASE_DIR
 
-# User
 RUN chmod +x /docker-entrypoint.sh /docker-cmd.sh && \
-    apk --no-cache add su-exec libpq-dev && \
     mkdir -p $DJANGO_STATIC_ROOT $DJANGO_MEDIA_ROOT $DJANGO_SQLITE_DIR && \
-    adduser -s /bin/sh -D -u $USER_UID $USER && \
     chown -R $USER:$USER $DJANGO_BASE_DIR $DJANGO_STATIC_ROOT $DJANGO_MEDIA_ROOT $DJANGO_SQLITE_DIR
 
-WORKDIR $DJANGO_BASE_DIR
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/docker-cmd.sh"]
 

@@ -11,6 +11,66 @@ dependencies = [
     "psycopg[binary]>=3.3.2",
     "pytest>=9.0.2",
     "pytest-django>=4.11.1",
+    "ruff>=0.14.10",
     "secure>=1.0.1",
     "wait-for-it>=2.3.0",
 ]
+
+[tool.ruff]
+ # Assume Python 3.11
+target-version = "py311"
+select = [
+  "E",    # Enforce pycodestyle errors (strict style and formatting correctness).
+  "W",    # Enforce pycodestyle warnings for consistent formatting.
+  "F",    # Pyflakes: detect unused names, undefined variables, and import issues.
+  "I",    # isort: normalize and group imports; mostly auto-fixable.
+  "B",    # flake8-bugbear: flag likely bugs and bad practices.
+  "C4",   # flake8-comprehensions: suggest efficient, readable comprehensions.
+  "UP",   # pyupgrade: modernize syntax to the target Python version.
+  "A",    # flake8-builtins: prevent shadowing of Python built-in names.
+  "DJ",   # flake8-django: Django-specific best practices and safety checks.
+  "TID",  # tidy-imports: import hygiene beyond isort (no star/re-exports).
+  "T20",  # flake8-print: disallow print/pprint in production code.
+]
+ignore = [
+    "E501",  # line too long
+    "B008",  # do not perform function calls in argument defaults
+    "W191",  # indentation contains tabs
+    "B904",  # Allow raising exceptions without from e
+]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["A", "B", "C4", "E", "F", "I", "TID", "UP"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".github",
+    ".hg",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "build",
+    "dist",
+    "migrations",
+    "node_modules",
+    "static",
+]
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 10
+
+[tool.ruff.lint.pyupgrade]
+# Preserve types, even if a file imports `from __future__ import annotations`.
+keep-runtime-typing = true

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party libraries
     "rest_framework",
+    "drf_spectacular",
     # Custom apps
     "apps.polls.apps.PollsConfig",
 ]
@@ -242,6 +243,7 @@ LOGGING = {
 # Django Rest Framework configuration
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
@@ -249,4 +251,13 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
     ],
     "PAGE_SIZE": 100,
+}
+
+# drf-spectacular - Swagger Documentation
+SPECTACULAR_SETTINGS = {
+    "TITLE": os.getenv("DOCS_TITLE", "Project API"),
+    "DESCRIPTION": os.getenv("DOCS_DESCRIPTION", "Project description"),
+    "VERSION": os.getenv("DOCS_VERSION", "1.0.0"),
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
 }

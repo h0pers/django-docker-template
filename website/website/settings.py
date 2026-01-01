@@ -51,7 +51,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "polls.apps.PollsConfig",
+    # Third-party libraries
+    "rest_framework",
+    # Custom apps
+    "apps.polls.apps.PollsConfig",
 ]
 
 MIDDLEWARE = [
@@ -234,4 +237,16 @@ LOGGING = {
             "propagate": False,
         },
     },
+}
+
+# Django Rest Framework configuration
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
+    ],
+    "PAGE_SIZE": 100,
 }

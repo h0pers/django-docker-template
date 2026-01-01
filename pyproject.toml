@@ -10,5 +10,6 @@ dependencies = [
     "psycopg[binary]>=3.3.2",
     "pytest>=9.0.2",
     "pytest-django>=4.11.1",
+    "secure>=1.0.1",
     "wait-for-it>=2.3.0",
 ]

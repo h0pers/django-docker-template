@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     # Custom apps
+    "apps.core.apps.CoreConfig",
     "apps.polls.apps.PollsConfig",
 ]
 

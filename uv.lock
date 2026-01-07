@@ -192,6 +192,7 @@ dependencies = [
     { name = "coverage" },
     { name = "django", version = "5.2.9", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "django", version = "6.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "django-settings" },
     { name = "djangorestframework" },
     { name = "drf-spectacular" },
     { name = "pre-commit" },
@@ -207,6 +208,7 @@ dependencies = [
 requires-dist = [
     { name = "coverage", specifier = ">=7.13.1" },
     { name = "django", specifier = ">=5.2.9" },
+    { name = "django-settings", specifier = ">=1.3.12" },
     { name = "djangorestframework", specifier = ">=3.16.1" },
     { name = "drf-spectacular", specifier = ">=0.29.0" },
     { name = "pre-commit", specifier = ">=4.5.1" },
@@ -217,6 +219,12 @@ requires-dist = [
     { name = "secure", specifier = ">=1.0.1" },
     { name = "wait-for-it", specifier = ">=2.3.0" },
 ]
+
+[[package]]
+name = "django-settings"
+version = "1.3.12"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/6d/8dcb21145af6ae3b3f8433b18b52d4be9833078b918f76190ce0562d4120/django-settings-1.3.12.tar.gz", hash = "sha256:8a7c01bd628291746d5fd57c6f1beeb5c0f1ce784cccccf2ddae989e5f69126d", size = 10741, upload-time = "2015-02-04T12:41:05.855Z" }
 
 [[package]]
 name = "djangorestframework"

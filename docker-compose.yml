@@ -10,6 +10,8 @@ services:
     build: .
     image: backend
     env_file: .env
+    environment:
+      - "DJANGO_ENV=production"
     restart: unless-stopped
     volumes:
       - "staticfiles-data:/var/www/static"

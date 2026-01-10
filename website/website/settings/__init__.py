@@ -32,6 +32,7 @@ components = [
     "components/email.py",
     "components/logging.py",
     "components/rest_framework.py",
+    "components/cors.py",
 ]
 
 # Environment-specific settings

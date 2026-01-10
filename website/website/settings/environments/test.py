@@ -41,3 +41,6 @@ LOGGING = {
 
 # Email backend for tests (doesn't send emails)
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+# Allow all origins in testing
+CORS_ALLOW_ALL_ORIGINS = True

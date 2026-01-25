@@ -38,5 +38,9 @@ components = [
 # Environment-specific settings
 environment = f"environments/{DJANGO_ENV}.py"
 
+# Test-specific components
+if DJANGO_ENV == "test":
+    components.append("components/testcontainers.py")
+
 # Include all settings
 include(*components, environment)

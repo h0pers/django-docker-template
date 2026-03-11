@@ -22,7 +22,7 @@ if ENV_FILE.exists():
     environ.Env.read_env(str(ENV_FILE))
 
 # Determine which environment to use
-DJANGO_ENV = env.str("DJANGO_ENV", default="development")
+DJANGO_ENV = env.str("DJANGO_ENV", default="production")
 
 # Component settings (shared across all environments)
 components = [
@@ -33,14 +33,11 @@ components = [
     "components/logging.py",
     "components/rest_framework.py",
     "components/cors.py",
+    "components/testcontainers.py",
 ]
 
 # Environment-specific settings
 environment = f"environments/{DJANGO_ENV}.py"
-
-# Test-specific components
-if DJANGO_ENV == "test":
-    components.append("components/testcontainers.py")
 
 # Include all settings
 include(*components, environment)

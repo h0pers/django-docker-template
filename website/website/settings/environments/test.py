@@ -16,13 +16,6 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 SECURE_SSL_REDIRECT = False
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "test",
-    }
-}
-
 # Disable logging during tests
 LOGGING = {
     "version": 1,

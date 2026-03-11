@@ -13,7 +13,7 @@ ARG PROJECT_NAME=website
 ARG DJANGO_BASE_DIR=/usr/src/$PROJECT_NAME
 WORKDIR $DJANGO_BASE_DIR
 
-RUN apk --no-cache add python3-dev libpq-dev
+RUN apk --no-cache add python3-dev libpq-dev git
 
 COPY pyproject.toml uv.lock ./
 

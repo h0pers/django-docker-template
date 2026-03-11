@@ -33,14 +33,11 @@ components = [
     "components/logging.py",
     "components/rest_framework.py",
     "components/cors.py",
+    "components/testcontainers.py",
 ]
 
 # Environment-specific settings
 environment = f"environments/{DJANGO_ENV}.py"
-
-# Test-specific components
-if DJANGO_ENV == "test":
-    components.append("components/testcontainers.py")
 
 # Include all settings
 include(*components, environment)

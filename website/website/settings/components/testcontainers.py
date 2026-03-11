@@ -1,6 +1,6 @@
 TESTCONTAINERS = {
     "postgres": {
-        "image": "postgres:17",
+        "image": "postgres:17-alpine",
     },
 }
 

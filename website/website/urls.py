@@ -23,14 +23,19 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path(
-        "api/docs/",
-        SpectacularSwaggerView.as_view(url_name="schema"),
-        name="swagger-ui",
-    ),
     path("api/", include("website.api")),
 ]
+
+if settings.DEBUG:
+    # Enable Swagger Documentation in debug mode
+    urlpatterns += [
+        path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+        path(
+            "api/docs/",
+            SpectacularSwaggerView.as_view(url_name="schema"),
+            name="swagger-ui",
+        ),
+    ]
 
 # Serve media files from MEDIA_ROOT. It will only work when DEBUG=True is set.
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

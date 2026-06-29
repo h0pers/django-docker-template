@@ -5,9 +5,27 @@ services:
     restart: unless-stopped
     volumes:
       - "postgres-data:/var/lib/postgresql/data/"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8.4-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
-    build: .
+    build:
+      context: .
+      target: development
     image: backend
     env_file: .env
     environment:
@@ -16,9 +34,12 @@ services:
     command: ["/docker-cmd.sh", "--debug"]
     volumes:
       - "media-data:/var/www/media"
-      - "./website:/usr/src/website"  # mount the source code for watching changes
+      - "./website:/usr/src/website"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.development.rule=Host(`127.0.0.1`) || Host(`localhost`)"
@@ -50,3 +71,4 @@ services:
 volumes:
   postgres-data:
   media-data:
+  redis-data:

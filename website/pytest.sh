@@ -8,3 +8,7 @@ then
 fi
 
 coverage report -m
+
+if [ "$1" = "--ci" ]; then
+    coverage xml
+fi

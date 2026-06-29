@@ -1,14 +1,14 @@
-from drf_spectacular.utils import OpenApiResponse, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 
 from apps.polls.api.v1 import docstring
+from apps.polls.api.v1.serializers import PollSerializer
 
-check_health_schema = extend_schema(
-    summary="Check Health API",
-    description=docstring.CHECK_HEALTH_DOCS,
+list_polls_schema = extend_schema(
+    summary="List Polls",
+    description=docstring.LIST_POLLS_DOCS,
+    tags=["Polls"],
     responses={
-        status.HTTP_200_OK: OpenApiResponse(
-            description=docstring.CHECK_HEALTH_RESPONSE_DOCS,
-        ),
+        status.HTTP_200_OK: PollSerializer(many=True),
     },
 )

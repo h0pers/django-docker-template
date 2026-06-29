@@ -5,74 +5,66 @@ services:
     restart: unless-stopped
     volumes:
       - "postgres-data:/var/lib/postgresql/data/"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8.4-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
-    build: .
-    image: backend
+    image: ghcr.io/${GITHUB_REPOSITORY}:latest
     env_file: .env
     environment:
       - "DJANGO_ENV=production"
+      - "DJANGO_ALLOWED_HOSTS=${MY_DOMAIN}"
+      - "DJANGO_CSRF_TRUSTED_ORIGINS=https://${MY_DOMAIN}"
     restart: unless-stopped
     volumes:
       - "staticfiles-data:/var/www/static"
       - "media-data:/var/www/media"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider --header=\"Host: $$MY_DOMAIN\" --header=\"X-Forwarded-Proto: https\" http://127.0.0.1:8000/api/health/ || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.development.rule=Host(`127.0.0.1`) || Host(`localhost`)"
-      - "traefik.http.routers.development.entrypoints=web"
-      - "traefik.http.routers.development.priority=1"
-
-  nginx:
-    image: nginx:1.28-alpine
-    env_file: .env
-    restart: unless-stopped
-    volumes:
-      - type: volume
-        source: media-data
-        target: /usr/share/nginx/html/media
-        read_only: true
-        volume:
-          nocopy: true
-      - type: volume
-        source: staticfiles-data
-        target: /usr/share/nginx/html/static
-        read_only: true
-        volume:
-          nocopy: true
-    depends_on:
-      - django
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.staticfiles.rule=PathPrefix(`/static/`) || PathPrefix(`/media/`)"
-      - "traefik.http.routers.staticfiles.entrypoints=web"
-      - "traefik.http.routers.staticfiles.priority=2"
-
-  reverse-proxy:
-    image: traefik:v3.6
-    env_file: .env
-    restart: unless-stopped
-    command:
-      #- "--log.level=DEBUG"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.le-resolver.acme.httpchallenge=true"
-      - "--certificatesresolvers.le-resolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.le-resolver.acme.email=admin@yourdomain.com"
-      - "--certificatesresolvers.le-resolver.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-      #- "8080:8080"
-    volumes:
-      - "./letsencrypt:/letsencrypt"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "traefik.docker.network=traefik-public"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${MY_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=le"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8000"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-www.rule=Host(`www.${MY_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-www.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-www.tls.certresolver=le"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-www.middlewares=${COMPOSE_PROJECT_NAME}-www-redirect"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-www-redirect.redirectregex.regex=^https?://www\\.${MY_DOMAIN}/?(.*)"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-www-redirect.redirectregex.replacement=https://${MY_DOMAIN}/$${1}"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-www-redirect.redirectregex.permanent=true"
+    networks:
+      - default
+      - traefik-public
 
 volumes:
   postgres-data:
   staticfiles-data:
   media-data:
+
+networks:
+  traefik-public:
+    external: true

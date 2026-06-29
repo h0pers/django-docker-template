@@ -32,8 +32,8 @@ components = [
     "components/email.py",
     "components/logging.py",
     "components/rest_framework.py",
+    "components/cache.py",
     "components/cors.py",
-    "components/testcontainers.py",
 ]
 
 # Environment-specific settings

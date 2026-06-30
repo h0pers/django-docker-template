@@ -7,26 +7,33 @@ from website.settings import BASE_DIR, env
 # Application definition
 
 INSTALLED_APPS = [
+{%- if cookiecutter.use_drf == "y" %}
     "corsheaders",
+{%- endif %}
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+{%- if cookiecutter.use_drf == "y" %}
     # Third-party libraries
     "rest_framework",
     "drf_spectacular",
+{%- endif %}
     # Custom apps
     "apps.core.apps.CoreConfig",
+{%- if cookiecutter.use_drf == "y" %}
     "apps.polls.apps.PollsConfig",
+{%- endif %}
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    # django-cors headers
+{%- if cookiecutter.use_drf == "y" %}
     "corsheaders.middleware.CorsMiddleware",
+{%- endif %}
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",

@@ -61,7 +61,9 @@ LOGGING = {
     },
 }
 
+{%- if cookiecutter.use_drf == "y" %}
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS")
 
 # Forcibly restrict all origin allowance
 CORS_ALLOW_ALL_ORIGINS = False
+{%- endif %}

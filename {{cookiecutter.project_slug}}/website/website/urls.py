@@ -19,15 +19,17 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+{%- if cookiecutter.use_drf == "y" %}
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+{%- endif %}
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("website.api")),
 ]
+{%- if cookiecutter.use_drf == "y" %}
 
 if settings.DEBUG:
-    # Enable Swagger Documentation in debug mode
     urlpatterns += [
         path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
         path(
@@ -36,6 +38,6 @@ if settings.DEBUG:
             name="swagger-ui",
         ),
     ]
+{%- endif %}
 
-# Serve media files from MEDIA_ROOT. It will only work when DEBUG=True is set.
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

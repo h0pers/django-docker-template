@@ -1,0 +1,46 @@
+name: Template Validation
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        use_drf: ["y", "n"]
+
+    name: use_drf=${{ matrix.use_drf }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install Cookiecutter
+        run: uv tool install cookiecutter
+
+      - name: Generate project
+        run: cookiecutter . --no-input use_drf=${{ matrix.use_drf }}
+
+      - name: Run pre-commit
+        working-directory: my-django-project
+        run: |
+          git init
+          git add .
+          uvx pre-commit run --all-files
+
+      - name: Build Docker image
+        working-directory: my-django-project
+        run: |
+          docker build --target development -t backend:test .
+
+      - name: Run tests
+        working-directory: my-django-project
+        run: |
+          docker compose -f docker-compose.test.yml run --rm test

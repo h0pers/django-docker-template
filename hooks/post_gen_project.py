@@ -1,4 +1,5 @@
 import shutil
+import subprocess
 from pathlib import Path
 
 USE_DRF = "{{ cookiecutter.use_drf }}" == "y"
@@ -21,9 +22,18 @@ def remove_paths(paths: list[str]) -> None:
             path.unlink()
 
 
+def generate_lock_file() -> None:
+    try:
+        subprocess.run(["uv", "lock"], check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("WARNING: Could not run 'uv lock'. Run it manually to generate uv.lock.")
+
+
 def main() -> None:
     if not USE_DRF:
         remove_paths(REMOVE_PATHS_NO_DRF)
+
+    generate_lock_file()
 
 
 if __name__ == "__main__":

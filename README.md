@@ -1,83 +1,45 @@
-# Django + Docker ❤️
+# Django Docker Template
 
-## Local Development
+A production-ready [Cookiecutter](https://github.com/cookiecutter/cookiecutter) template for Django projects, fully containerized with Docker.
 
-### Debug (hot reload, mounts source)
+## Stack
 
-```bash
-docker compose -f docker-compose.debug.yml up --build
-```
+- **Python 3.11** with [uv](https://github.com/astral-sh/uv) for dependency management
+- **Django 5.2** with split settings (`development` / `production` / `test`)
+- **PostgreSQL 17** (Alpine)
+- **Redis 8.4** for caching
+- **Gunicorn** as the WSGI server
+- **Traefik** reverse proxy with automatic Let's Encrypt TLS
+- **Docker** multi-stage builds (separate `development` and `production` targets)
 
-Backend available at `http://localhost`.
+## Template Options
 
-### Tests
+| Option | Default | Description |
+|---|---|---|
+| `project_name` | My Django Project | Human-readable project name |
+| `project_slug` | auto-generated | Directory and package name (derived from project name) |
+| `description` | A Django project | Short project description |
+| `author_name` | Your Name | Author name |
+| `use_drf` | y | Include Django REST Framework with drf-spectacular OpenAPI docs |
 
-```bash
-# Build test image first (only needed when deps change)
-docker build --target development -t backend:test .
+### When `use_drf` is enabled
 
-# Run full test suite
-docker compose -f docker-compose.test.yml run --rm test
+The template includes DRF, drf-spectacular for OpenAPI schema generation, django-cors-headers, and a pre-configured health check endpoint at `/api/health/`.
 
-# Run specific test file
-docker compose -f docker-compose.test.yml run --rm test pytest apps/payments/tests/test_something.py
+## CI/CD
 
-# Run with coverage
-docker compose -f docker-compose.test.yml run --rm test ./pytest.sh --ci
-```
+Three GitHub Actions workflows are included:
 
-### Production (local smoke test)
+- **CI** — builds the Docker image and runs the test suite on every push
+- **Deploy** — deploys to a VPS via SSH on pushes to `master`
+- **Pre-commit** — runs linting checks via pre-commit hooks
 
-```bash
-# Uses pre-built image from GHCR - does not build locally
-docker compose up
-```
+## Code Quality
 
----
+- **Ruff** for linting and formatting
+- **pre-commit** hooks for consistent code style
+- **pytest** + **coverage** for testing
 
-## VPS First-Time Setup
+## Documentation
 
-Before the first deploy, run these commands on the VPS to register the systemd service. This is a one-time manual step — the deploy workflow does not handle it.
-
-```bash
-REPO_NAME="$REPO_NAME"
-DEPLOY_USER=$VPS_USER   # the user set in VPS_USER GitHub secret
-APP_DIR="/home/$DEPLOY_USER/$REPO_NAME"
-
-sudo tee /etc/systemd/system/$REPO_NAME.service <<SERVICE
-[Unit]
-Description=$REPO_NAME
-After=docker.service network-online.target
-Requires=docker.service
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-WorkingDirectory=$APP_DIR
-ExecStart=/usr/bin/docker compose up -d
-ExecStop=/usr/bin/docker compose down
-TimeoutStartSec=300
-
-[Install]
-WantedBy=multi-user.target
-SERVICE
-
-sudo systemctl daemon-reload
-sudo systemctl enable $REPO_NAME.service
-```
-
-After this, all subsequent deploys are handled automatically by the GitHub Actions workflow on every push to `master`.
-
-## Per-Server Runtime Configuration
-
-`GUNICORN_WORKERS` and `GUNICORN_TIMEOUT` are not deployed by CI - they are server-specific (depends on CPU/memory). Configure them once by creating `docker-compose.override.yml` on the server. Docker Compose merges it automatically and CI never overwrites it.
-
-```yaml
-services:
-  backend:
-    environment:
-      - "GUNICORN_WORKERS=4"
-      - "GUNICORN_TIMEOUT=60"
-```
-
-Adjust `GUNICORN_WORKERS` to `(2 * CPU cores) + 1`. If the file is absent, defaults (`2` workers, `60`s timeout) apply.
+For setup instructions, local development commands, VPS deployment, and runtime configuration, see the [project README]({{cookiecutter.project_slug}}/README.md) inside the generated project.

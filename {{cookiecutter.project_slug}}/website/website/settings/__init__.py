@@ -31,9 +31,13 @@ components = [
     "components/security.py",
     "components/email.py",
     "components/logging.py",
+{%- if cookiecutter.use_drf == "y" %}
     "components/rest_framework.py",
+{%- endif %}
     "components/cache.py",
+{%- if cookiecutter.use_drf == "y" %}
     "components/cors.py",
+{%- endif %}
 ]
 
 # Environment-specific settings

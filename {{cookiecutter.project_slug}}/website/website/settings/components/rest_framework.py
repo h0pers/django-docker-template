@@ -19,8 +19,8 @@ REST_FRAMEWORK = {
 
 # drf-spectacular - Swagger Documentation
 SPECTACULAR_SETTINGS = {
-    "TITLE": env.str("DOCS_TITLE", default="Project API"),
-    "DESCRIPTION": env.str("DOCS_DESCRIPTION", default="Project description"),
+    "TITLE": env.str("DOCS_TITLE", default="{{ cookiecutter.project_name }} API"),
+    "DESCRIPTION": env.str("DOCS_DESCRIPTION", default="{{ cookiecutter.description }}"),
     "VERSION": env.str("DOCS_VERSION", default="1.0.0"),
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,

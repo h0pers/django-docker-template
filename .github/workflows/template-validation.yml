@@ -30,7 +30,10 @@ jobs:
 
       - name: Run pre-commit
         working-directory: my-django-project
-        run: uvx pre-commit run --all-files
+        run: |
+          git init
+          git add .
+          uvx pre-commit run --all-files
 
       - name: Build Docker image
         working-directory: my-django-project

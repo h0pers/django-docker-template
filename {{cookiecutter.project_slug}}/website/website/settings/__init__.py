@@ -38,6 +38,9 @@ components = [
 {%- if cookiecutter.use_drf == "y" %}
     "components/cors.py",
 {%- endif %}
+{%- if cookiecutter.use_wagtail == "y" %}
+    "components/wagtail.py",
+{%- endif %}
 ]
 
 # Environment-specific settings

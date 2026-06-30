@@ -16,6 +16,22 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+{%- if cookiecutter.use_wagtail == "y" %}
+    # Wagtail
+    "wagtail.contrib.forms",
+    "wagtail.contrib.redirects",
+    "wagtail.embeds",
+    "wagtail.sites",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.search",
+    "wagtail.admin",
+    "wagtail",
+    "modelcluster",
+    "taggit",
+{%- endif %}
 {%- if cookiecutter.use_drf == "y" %}
     # Third-party libraries
     "rest_framework",
@@ -23,6 +39,9 @@ INSTALLED_APPS = [
 {%- endif %}
     # Custom apps
     "apps.core.apps.CoreConfig",
+{%- if cookiecutter.use_wagtail == "y" %}
+    "apps.cms.apps.CmsConfig",
+{%- endif %}
 {%- if cookiecutter.use_drf == "y" %}
     "apps.polls.apps.PollsConfig",
 {%- endif %}
@@ -40,6 +59,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.core.middleware.set_secure_headers",
+{%- if cookiecutter.use_wagtail == "y" %}
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
+{%- endif %}
 ]
 
 ROOT_URLCONF = "website.urls"

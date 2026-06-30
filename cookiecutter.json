@@ -4,8 +4,10 @@
     "description": "A Django project",
     "author_name": "Your Name",
     "use_drf": ["y", "n"],
+    "use_wagtail": ["n", "y"],
     "_copy_without_render": [
         ".github/**",
-        "website/templates/**"
+        "website/templates/**",
+        "website/apps/**/templates/**"
     ]
 }

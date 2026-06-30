@@ -3,6 +3,7 @@ import subprocess
 from pathlib import Path
 
 USE_DRF = "{{ cookiecutter.use_drf }}" == "y"
+USE_WAGTAIL = "{{ cookiecutter.use_wagtail }}" == "y"
 
 REMOVE_PATHS_NO_DRF = [
     "website/apps/polls",
@@ -10,6 +11,11 @@ REMOVE_PATHS_NO_DRF = [
     "website/website/settings/components/cors.py",
     "website/apps/core/api/schema.py",
     "website/apps/core/api/docstring.py",
+]
+
+REMOVE_PATHS_NO_WAGTAIL = [
+    "website/apps/cms",
+    "website/website/settings/components/wagtail.py",
 ]
 
 
@@ -32,6 +38,9 @@ def generate_lock_file() -> None:
 def main() -> None:
     if not USE_DRF:
         remove_paths(REMOVE_PATHS_NO_DRF)
+
+    if not USE_WAGTAIL:
+        remove_paths(REMOVE_PATHS_NO_WAGTAIL)
 
     generate_lock_file()
 

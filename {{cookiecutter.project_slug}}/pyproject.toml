@@ -14,6 +14,9 @@ dependencies = [
     "djangorestframework-stubs>=3.17.0",
     "drf-spectacular>=0.29.0",
 {%- endif %}
+{%- if cookiecutter.use_wagtail == "y" %}
+    "wagtail>=7.4.2",
+{%- endif %}
     "gunicorn>=23.0.0",
     "pre-commit>=4.5.1",
     "psycopg[binary]>=3.3.2",

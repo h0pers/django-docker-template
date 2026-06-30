@@ -12,8 +12,9 @@ jobs:
     strategy:
       matrix:
         use_drf: ["y", "n"]
+        use_wagtail: ["y", "n"]
 
-    name: use_drf=${{ matrix.use_drf }}
+    name: drf=${{ matrix.use_drf }},wagtail=${{ matrix.use_wagtail }}
 
     steps:
       - name: Checkout
@@ -26,7 +27,7 @@ jobs:
         run: uv tool install cookiecutter
 
       - name: Generate project
-        run: cookiecutter . --no-input use_drf=${{ matrix.use_drf }}
+        run: cookiecutter . --no-input use_drf=${{ matrix.use_drf }} use_wagtail=${{ matrix.use_wagtail }}
 
       - name: Run pre-commit
         working-directory: my-django-project

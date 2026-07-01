@@ -4,18 +4,31 @@ from pathlib import Path
 
 USE_DRF = "{{ cookiecutter.use_drf }}" == "y"
 USE_WAGTAIL = "{{ cookiecutter.use_wagtail }}" == "y"
+USE_VUE = "{{ cookiecutter.use_vue }}" == "y"
 
 REMOVE_PATHS_NO_DRF = [
-    "website/apps/polls",
     "website/website/settings/components/rest_framework.py",
     "website/website/settings/components/cors.py",
     "website/apps/core/api/schema.py",
     "website/apps/core/api/docstring.py",
+    "website/apps/polls/api",
+]
+
+REMOVE_PATHS_NO_DRF_AND_NO_VUE = [
+    "website/apps/polls",
 ]
 
 REMOVE_PATHS_NO_WAGTAIL = [
     "website/apps/cms",
     "website/website/settings/components/wagtail.py",
+]
+
+REMOVE_PATHS_NO_VUE = [
+    "frontend",
+    "website/website/settings/components/vite.py",
+    "website/apps/polls/templates",
+    "website/apps/polls/views.py",
+    "website/apps/polls/urls.py",
 ]
 
 
@@ -26,6 +39,13 @@ def remove_paths(paths: list[str]) -> None:
             shutil.rmtree(path)
         elif path.is_file():
             path.unlink()
+
+
+def generate_frontend_lock_file() -> None:
+    try:
+        subprocess.run(["npm", "install", "--package-lock-only"], cwd="frontend", check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("WARNING: Could not run 'npm install --package-lock-only'. Run it manually in frontend/ directory.")
 
 
 def generate_lock_file() -> None:
@@ -39,8 +59,17 @@ def main() -> None:
     if not USE_DRF:
         remove_paths(REMOVE_PATHS_NO_DRF)
 
+    if not USE_DRF and not USE_VUE:
+        remove_paths(REMOVE_PATHS_NO_DRF_AND_NO_VUE)
+
     if not USE_WAGTAIL:
         remove_paths(REMOVE_PATHS_NO_WAGTAIL)
+
+    if not USE_VUE:
+        remove_paths(REMOVE_PATHS_NO_VUE)
+
+    if USE_VUE:
+        generate_frontend_lock_file()
 
     generate_lock_file()
 

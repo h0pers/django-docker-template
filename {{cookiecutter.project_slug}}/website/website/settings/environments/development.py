@@ -29,3 +29,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # Allow all origins in development
 CORS_ALLOW_ALL_ORIGINS = True
 {%- endif %}
+{%- if cookiecutter.use_vue == "y" %}
+
+DJANGO_VITE["default"]["dev_mode"] = True
+{%- endif %}

@@ -13,8 +13,9 @@ jobs:
       matrix:
         use_drf: ["y", "n"]
         use_wagtail: ["y", "n"]
+        use_vue: ["y", "n"]
 
-    name: drf=${{ matrix.use_drf }},wagtail=${{ matrix.use_wagtail }}
+    name: drf=${{ matrix.use_drf }},wagtail=${{ matrix.use_wagtail }},vue=${{ matrix.use_vue }}
 
     steps:
       - name: Checkout
@@ -26,8 +27,14 @@ jobs:
       - name: Install Cookiecutter
         run: uv tool install cookiecutter
 
+      - name: Setup Node.js
+        if: matrix.use_vue == 'y'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Generate project
-        run: cookiecutter . --no-input use_drf=${{ matrix.use_drf }} use_wagtail=${{ matrix.use_wagtail }}
+        run: cookiecutter . --no-input use_drf=${{ matrix.use_drf }} use_wagtail=${{ matrix.use_wagtail }} use_vue=${{ matrix.use_vue }}
 
       - name: Run pre-commit
         working-directory: my-django-project

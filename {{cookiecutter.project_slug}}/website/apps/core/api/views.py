@@ -7,12 +7,12 @@ from apps.core.api.schema import health_schema
 
 @health_schema
 @api_view(["GET"])
-def health(request):
+def health(request) -> Response:
     return Response({"status": "ok"})
 {% else -%}
 from django.http import JsonResponse
 
 
-def health(request):
+def health(request) -> JsonResponse:
     return JsonResponse({"status": "ok"})
 {% endif -%}

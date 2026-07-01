@@ -7,3 +7,6 @@
 __pycache__/
 local_settings.py
 media
+{%- if cookiecutter.use_vue == "y" %}
+node_modules/
+{%- endif %}

@@ -32,6 +32,9 @@ INSTALLED_APPS = [
     "modelcluster",
     "taggit",
 {%- endif %}
+{%- if cookiecutter.use_vue == "y" %}
+    "django_vite",
+{%- endif %}
 {%- if cookiecutter.use_drf == "y" %}
     # Third-party libraries
     "rest_framework",
@@ -42,7 +45,7 @@ INSTALLED_APPS = [
 {%- if cookiecutter.use_wagtail == "y" %}
     "apps.cms.apps.CmsConfig",
 {%- endif %}
-{%- if cookiecutter.use_drf == "y" %}
+{%- if cookiecutter.use_drf == "y" or cookiecutter.use_vue == "y" %}
     "apps.polls.apps.PollsConfig",
 {%- endif %}
 ]

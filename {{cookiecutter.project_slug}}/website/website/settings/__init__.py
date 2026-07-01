@@ -41,6 +41,9 @@ components = [
 {%- if cookiecutter.use_wagtail == "y" %}
     "components/wagtail.py",
 {%- endif %}
+{%- if cookiecutter.use_vue == "y" %}
+    "components/vite.py",
+{%- endif %}
 ]
 
 # Environment-specific settings

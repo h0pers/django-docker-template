@@ -61,7 +61,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "apps.core.middleware.set_secure_headers",
 {%- if cookiecutter.use_wagtail == "y" %}
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 {%- endif %}

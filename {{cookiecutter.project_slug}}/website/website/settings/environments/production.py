@@ -7,6 +7,8 @@ from website.settings import env
 # Debug mode disabled
 DEBUG = False
 
+MIDDLEWARE.append("apps.core.middleware.set_secure_headers")
+
 # Must be configured via environment variable
 SECRET_KEY = env.str("DJANGO_SECRET_KEY")
 

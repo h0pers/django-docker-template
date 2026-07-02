@@ -19,6 +19,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+{%- if cookiecutter.use_vue == "y" %}
+from django.views.generic import RedirectView
+{%- endif %}
 {%- if cookiecutter.use_drf == "y" %}
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 {%- endif %}
@@ -50,6 +53,13 @@ if settings.DEBUG:
 {%- endif %}
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+{%- if cookiecutter.use_vue == "y" %}
+
+urlpatterns += [
+    path("", RedirectView.as_view(pattern_name="polls:spa")),
+    path("app/", include("apps.polls.urls")),
+]
+{%- endif %}
 {%- if cookiecutter.use_wagtail == "y" %}
 
 urlpatterns += [

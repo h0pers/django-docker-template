@@ -131,3 +131,10 @@ letsencrypt/
 
 # Enviroment variables
 .env
+{%- if cookiecutter.use_vue == "y" %}
+
+# Frontend
+node_modules/
+website/static/dist/
+!frontend/src/lib/
+{%- endif %}

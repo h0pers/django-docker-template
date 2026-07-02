@@ -52,7 +52,21 @@ EXPOSE $GUNICORN_PORT
 FROM runtime AS development
 
 COPY --from=deps-dev /opt/venv /opt/venv
+{%- if cookiecutter.use_vue == "y" %}
+
+FROM node:22-alpine AS frontend-build
+WORKDIR /app/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ /app/frontend/
+COPY website/apps/ /app/website/apps/
+COPY website/templates/ /app/website/templates/
+RUN npm run build
+{%- endif %}
 
 FROM runtime AS production
 
 COPY --from=deps /opt/venv /opt/venv
+{%- if cookiecutter.use_vue == "y" %}
+COPY --chown=$USER:$USER --from=frontend-build /app/website/static/dist $DJANGO_BASE_DIR/static/dist/
+{%- endif %}

@@ -55,6 +55,15 @@ def generate_lock_file() -> None:
         print("WARNING: Could not run 'uv lock'. Run it manually to generate uv.lock.")
 
 
+def init_git() -> None:
+    try:
+        subprocess.run(["git", "init"], check=True)
+        subprocess.run(["git", "add", "."], check=True)
+        subprocess.run(["git", "commit", "-m", "Initial commit"], check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("WARNING: Could not initialize git repository. Run 'git init' manually.")
+
+
 def main() -> None:
     if not USE_DRF:
         remove_paths(REMOVE_PATHS_NO_DRF)
@@ -72,6 +81,7 @@ def main() -> None:
         generate_frontend_lock_file()
 
     generate_lock_file()
+    init_git()
 
 
 if __name__ == "__main__":

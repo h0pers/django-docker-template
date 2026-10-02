@@ -131,6 +131,7 @@ letsencrypt/
 
 # Enviroment variables
 .env
+walg.env
 {%- if cookiecutter.use_vue == "y" %}
 
 # Frontend

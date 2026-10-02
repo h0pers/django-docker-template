@@ -92,13 +92,33 @@ jobs:
             fi
           } > .env
 
+      - name: Create walg.env
+        run: |
+          touch walg.env
+          if [ -n "${{ secrets.WALG_S3_PREFIX }}" ]; then
+            if [ -z "${{ secrets.WALG_LIBSODIUM_KEY }}" ]; then
+              echo "WALG_LIBSODIUM_KEY secret is required when WALG_S3_PREFIX is set" >&2
+              exit 1
+            fi
+            {
+              echo "WALG_S3_PREFIX=${{ secrets.WALG_S3_PREFIX }}"
+              echo "AWS_ENDPOINT=${{ secrets.WALG_AWS_ENDPOINT }}"
+              echo "AWS_REGION=${{ secrets.WALG_AWS_REGION }}"
+              echo "AWS_ACCESS_KEY_ID=${{ secrets.WALG_AWS_ACCESS_KEY_ID }}"
+              echo "AWS_SECRET_ACCESS_KEY=${{ secrets.WALG_AWS_SECRET_ACCESS_KEY }}"
+              echo "AWS_S3_FORCE_PATH_STYLE=${{ secrets.WALG_AWS_S3_FORCE_PATH_STYLE }}"
+              echo "WALG_LIBSODIUM_KEY=${{ secrets.WALG_LIBSODIUM_KEY }}"
+              echo "WALG_LIBSODIUM_KEY_TRANSFORM=hex"
+            } > walg.env
+          fi
+
       - name: Copy configs to server
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ".env,docker-compose.yml"
+          source: ".env,walg.env,docker-compose.yml,docker"
           target: "~/${{ github.event.repository.name }}/"
           overwrite: true
 
@@ -122,7 +142,7 @@ jobs:
             echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
             docker compose pull backend
-            docker compose up -d postgres
+            docker compose up -d --build postgres postgres-backup
             docker compose run --rm backend python manage.py migrate --noinput
 
             docker rollout backend --timeout 120

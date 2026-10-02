@@ -116,15 +116,16 @@ docker compose logs postgres-backup                     # backup logs
 The restore goes into a new volume, so the current database stays untouched until you switch. `myproject` below is your Compose project name (see `docker volume ls`), times are UTC.
 
 ```bash
-# 1. Create an empty volume
+# 1. Stop the app and database, so no new writes get lost
+docker compose stop backend postgres-backup postgres
+
+# 2. Create an empty volume
 docker volume create myproject_postgres-data-restored
 
-# 2. Restore into it. Without a time it restores the latest state
+# 3. Restore into it. Without a time it restores the latest state
 docker compose run --rm --no-deps -v myproject_postgres-data-restored:/restore \
   postgres-backup restore.sh "2026-10-02 14:25"
 ```
-
-If the database crashed, stop it first with `docker compose stop postgres`, so the restore also recovers its last unarchived changes.
 
 Check `restored_up_to` in the output, then switch to the restored volume in `docker-compose.override.yml`:
 
@@ -136,11 +137,10 @@ volumes:
 ```
 
 ```bash
-# 3. Restart on the restored database and take a fresh backup
-docker compose stop backend postgres-backup postgres
+# 4. Start on the restored database and take a fresh backup
 docker compose up -d
 docker compose exec postgres-backup backup.sh
 
-# 4. Once everything looks right, remove the old volume
+# 5. Once everything looks right, remove the old volume
 docker volume rm myproject_postgres-data
 ```

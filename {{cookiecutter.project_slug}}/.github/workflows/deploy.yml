@@ -106,6 +106,7 @@ jobs:
               echo "AWS_REGION=${{ secrets.WALG_AWS_REGION }}"
               echo "AWS_ACCESS_KEY_ID=${{ secrets.WALG_AWS_ACCESS_KEY_ID }}"
               echo "AWS_SECRET_ACCESS_KEY=${{ secrets.WALG_AWS_SECRET_ACCESS_KEY }}"
+              echo "AWS_S3_FORCE_PATH_STYLE=${{ secrets.WALG_AWS_S3_FORCE_PATH_STYLE }}"
               echo "WALG_LIBSODIUM_KEY=${{ secrets.WALG_LIBSODIUM_KEY }}"
               echo "WALG_LIBSODIUM_KEY_TRANSFORM=hex"
             } > walg.env

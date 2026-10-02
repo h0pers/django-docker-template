@@ -16,6 +16,11 @@ if [ -n "$(ls -A /restore)" ]; then
     exit 1
 fi
 
+if pg_isready -q; then
+    echo "Stop the database first: docker compose stop backend postgres-backup postgres" >&2
+    exit 1
+fi
+
 # 1. Fetch the newest backup that finished before the target time
 backup=LATEST
 if [ -n "$target_time" ]; then
@@ -24,10 +29,8 @@ if [ -n "$target_time" ]; then
 fi
 wal-g backup-fetch /restore "$backup"
 
-# 2. If the old server is down, add its unarchived WAL so nothing is lost
-if ! pg_isready -q; then
-    cp "$PGDATA"/pg_wal/0* /restore/pg_wal/ || true
-fi
+# 2. Add the old server's unarchived WAL so nothing is lost
+cp "$PGDATA"/pg_wal/0* /restore/pg_wal/ || true
 
 # 3. Replay WAL in a temporary server, then promote it
 touch /restore/recovery.signal
